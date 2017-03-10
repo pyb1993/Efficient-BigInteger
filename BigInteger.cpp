@@ -2,20 +2,60 @@
 #include "StringBigdata.h"
 #include "sstream"
 #include "cassert"
+#include "algorithm"
+#include <utility>
+
 using namespace std;
 
-BigInteger::BigInteger(){
+BigInteger::BigInteger(const int Base, const int Width):\
+BASE(Base), WIDTH(Width)
+{
 	s = new datatype();
 }
 
-BigInteger::BigInteger(const BigInteger& rhs) : s(new datatype(*rhs.s)), negative(rhs.negative)
-{}
+BigInteger::BigInteger(const BigInteger& rhs, const int Base, const int Width) :\
+s(new datatype(*rhs.s)), negative(rhs.negative), BASE(Base),WIDTH(Width){   }
 
-BigInteger::BigInteger(const long long& num){ 
+//接收FFT的结果
+BigInteger::BigInteger(const vector<double>& Coef, size_t len, long long other_base,short other_width)//用来接收一个数组,专门处理FFT的结果
+:BASE(DefaultBase), WIDTH(DefaultWIDTH), s( new datatype)
+{
+	s->reserve(len >> 1);
+	long long carry = 0;
+	int i = 0;
+	for (; i+1 < len; i += 2){
+		long long x = carry + Coef[i] + Coef[i+1] * other_base;
+		if (x > BASE)
+		{
+			carry = x / BASE;
+			x %= BASE;
+		}
+		s->push_back(x%BASE);
+	}
+	if (i != len) carry += Coef[len - 1];
+	while (carry) {
+		s->push_back(carry%BASE);
+		carry /= BASE;
+	}
+
+}
+
+//移动构造函数
+BigInteger::BigInteger(BigInteger&& rhs, const int Base, const int Width) NOEXCEPT  :
+negative(rhs.negative), s(rhs.s), BASE(Base), WIDTH(Width)
+{
+	rhs.s = nullptr;//这样对其调用析构函数是安全的
+}
+
+BigInteger::BigInteger(const long long& num, const int Base, const int Width):\
+BASE(Base), WIDTH(Width)
+{
 	s = new datatype();
 	*this = num; 
 }
-BigInteger::BigInteger(const string& str){
+BigInteger::BigInteger(const string& str, const int Base, const int Width) :\
+BASE(Base), WIDTH(Width)
+{
 	s = new datatype();
 	*this = str;
 }
@@ -42,8 +82,23 @@ BigInteger& BigInteger:: operator= (const string& str){
 	    int str_len = str.length();
 	    assert(str_len != 0);
 		vec_from_str(str);
+		remove_redundant_zeros();
 		return *this;
 	}
+
+
+//移动赋值运算符
+BigInteger& BigInteger:: operator= (BigInteger&& rhs)NOEXCEPT{
+	if (this != &rhs){
+		delete s;
+		s = rhs.s;
+		negative = rhs.negative;
+		rhs.s = nullptr;
+	}
+	return *this;
+}
+
+
 
 BigInteger:: ~BigInteger(){
 	delete s;
@@ -64,13 +119,19 @@ BigInteger BigInteger:: operator + (const BigInteger& rhs) const{
 		count = x / BASE;
 		ret.push_back(x%BASE);
 	}
+	ret.remove_redundant_zeros();
 	return ret;
 }
 BigInteger  subtract(const BigInteger& lhs, const BigInteger& rhs, bool neg)
 {
-	assert(lhs >= 0 && rhs >= 0);//暂时只处理正数
-	//首先消除前置的0;
-	auto BASE = BigInteger::BASE;
+	if (!(lhs >= 0 && rhs >= 0))
+	{
+		cout << 1;
+	}
+		assert(lhs >= 0 && rhs >= 0);//暂时只处理正数
+		assert(lhs.BASE == rhs.BASE);
+		
+	auto BASE = rhs.BASE;
 	BigInteger ret;
 	auto llen = lhs.length();
 	auto rlen = rhs.length();
@@ -99,14 +160,16 @@ BigInteger  subtract(const BigInteger& lhs, const BigInteger& rhs, bool neg)
 BigInteger BigInteger::operator - (const BigInteger& rhs) const
 {
     //暂时只处理正数
-	return subtract(*this, rhs);
+	auto ret = subtract(*this, rhs);
+	ret.remove_redundant_zeros();
+	return ret;
 }
 
+#if 1
+BigInteger BigInteger::operator *(const BigInteger& rhs) const
+{
 
-#if 0
-BigInteger BigInteger::operator *(const BigInteger& rhs) const{
-
-	//乘法的分治算法
+	//乘法的KR算法
 	auto llen = length(), rlen = rhs.length();
 	assert(llen > 0 && rlen > 0);
 
@@ -114,43 +177,104 @@ BigInteger BigInteger::operator *(const BigInteger& rhs) const{
 	if (llen < rlen){
 		return rhs* (*this);
       }
-		if (llen== 1 && rlen == 1){
-			return long long( s[0] * rhs[0]);
+		
+	if (llen== 1 && rlen == 1){
+		return  long long((*s)[0]) * long long(rhs[0]);
 		}
+	if (*this == BigInteger("0") || rhs == BigInteger("0"))
+		return BigInteger("0");
 
-		BigInteger s;
-		if (llen * 2 > rlen){
-			size_t weight = llen >> 1;
-			size_t mid1 = llen - weight, mid2 = rlen - weight;//注意这里的trick
-
+		BigInteger ret;
+		
+		if (rlen * 2 > llen){
+			size_t sub_len = llen >> 1;   //低位的长度,确保低位长度一致
+			
+			size_t mid1 = llen - sub_len, mid2 = rlen - sub_len;//注意这里的trick
 			auto a1 =  sub_integer_rough(0, mid1),      a0 = sub_integer_rough(mid1);
 			auto b1 = rhs.sub_integer_rough(0, mid2), b0 = rhs.sub_integer_rough(mid2);
+			size_t weight =  sub_len * WIDTH;//权重 = 8*sublen
 
 			auto z2 = a1 * b1;// z2 = a1*b1
 			auto z0 = a0 * b0;// z0 = a0*b0
 
 			auto middle_res = (a1+ a0)*(b1+b0);//(a1+a0)(b1+b0)
 
+			auto z1 = middle_res - z2 - z0;
 
-			//auto z1 = Subtract(Subtract(middle_res, z2), z0);//z1 = middle_res - z2 - z0，
-
-			//assert(z1[0] != '-' || !(cout << " (" <<a1+"+"+a0 << " ) * ("<<b1+"+"+b0 <<") = "<<middle_res<<endl<<\
-						//middle_res<<" - "<< z2+"- "+z0 + " :(" +a0+"* "+b0+ ")"<<" = "<< z1<<endl));
-
-			s = z2 + string(weight << 1, '0');// z2 * 10^(2*mid)
-			s = add(s, (z1 + string(weight, '0')));// z1  * 10^mid
-			s = add(s, z0);//z0
+			z2.append_zeros(weight<<1);//z2 * 10^(2*mid)
+			z1.append_zeros(weight);
+			ret = z2 + z1 + z0;
 		}
-		else{//b的位数太小,不足以计算
-			size_t mid = a_len >> 1;
-			size_t weight = a_len - mid;
-			string a1 = a.substr(0, mid), a0 = a.substr(mid);
-			auto z1 = Effective_multiply(a1, b);
-			auto z0 = Effective_multiply(a0, b);
-			s = z1 + string(weight, '0');
-			s = add(s, z0);
+		else{//b的位数太小,不足以分割
+			size_t mid = llen >> 1;
+			auto a1 = sub_integer_rough(0, mid), a0 = sub_integer_rough(mid);
+			size_t weight = a0.length() * WIDTH;//权重 = 8*低位长度
+
+			auto z1 = a1 * rhs;
+			auto z0 = a0 * rhs;
+			z1.append_zeros(weight);
+			ret = z1 + z0;
 		}
-		return s;
+		ret.remove_redundant_zeros();
+		return ret;
+}
+#endif
+
+BigInteger BigInteger:: operator <<(size_t shift_num) const{
+
+	auto len = length();
+	int shift_amount = 36;//trick 一次最多移动36位  2^36 < (2^64-1)/(1+BASE)
+	BigInteger ret(*this);
+	ret.reserve(len + 10);
+
+	for (int count = shift_num; count > 0;	count -= shift_amount){
+
+		shift_amount = min(count, shift_amount);
+		unsigned long long carry = 0;
+		int i ;
+		for ( i = 0; i < ret.length(); ++i)
+		{
+			unsigned long  long val = ( unsigned long long(ret[i]) << shift_amount) + carry;//long long转换,为了多移位
+			ret[i] =  val%BASE;
+			carry = val / BASE;
+		}
+		while (carry > 0){
+			ret.push_back(carry % BASE);
+			carry /= BASE;
+		}
+	}
+	return ret;
+}
+
+
+
+BigInteger BigInteger:: operator >>(size_t shift_num) const{
+
+}
+
+
+#if 0
+BigInteger BigInteger::Inverse() const{
+
+	auto len = length();
+	if (len == 1) return BigInteger(1 / (*s)[0]);
+
+	double InvBase = 1. / BASE;
+	double x = (*s)[len - 1] + InvBase* (*s)[len - 2];
+	x = BASE / x;
+	
+	auto tmp = BigInteger(*this)*BigInteger(x);
+
+
+}
+#endif
+#if 0
+BigInteger BigInteger::operator / (const BigInteger& rhs) const{
+
+	
+	B->Coef[1] = floor(x);
+	B->Coef[0] = floor((x - B->Coef[1])*BASE);
+	B->Size = 2;
 }
 #endif
 
@@ -185,10 +309,10 @@ BigInteger BigInteger::operator %(const BigInteger& rhs) const{
 BigInteger BigInteger::operator %(const BigInteger& rhs) const{
 	auto s1 = *this;
 	auto s2 = rhs;
-	return BigInteger(Mod(s1,s2));
+	auto ret = BigInteger(Mod(s1,s2));
+	ret.remove_redundant_zeros();
+	return ret;
 }
-
-
 
 size_t BigInteger::digits_len()const{
 	auto len1 =  (length() - 1) * WIDTH;
@@ -200,15 +324,22 @@ void  BigInteger::push_back(const eletype& x) { s->push_back(x); }
 void BigInteger::resize(size_t size){ s->resize(size); }
 void BigInteger::reserve(size_t size){ s->reserve(size); }
 
-BigInteger BigInteger::sub_integer_rough(size_t start, size_t len)const{
+BigInteger BigInteger::sub_integer_rough(size_t start, unsigned int len)const{
 	//注意这里的 start是逻辑上的,我们需要倒过来计算
-	int new_start = length() - start - len;
+	auto _length = length();
+	assert(start>=0 && start< _length && _length != 0);
+
 	BigInteger ret;
-	if (len+start > length() ){
-		len = length();
-	}
+
+	size_t new_end = _length - start;
+	size_t new_start;
+	if (len == npos || len >= new_end)
+		new_start = 0;
+	else
+		new_start = new_end - len;
+
 	auto iter    = s->begin() + new_start;
-	auto e_iter = iter + len;
+	auto e_iter = s->begin() + new_end;
 	ret.s = new datatype (iter, e_iter);
 	return ret;
 }
@@ -232,14 +363,11 @@ void BigInteger::append_digits(const string& _str){
 	string str = *this;
 	str += _str;
 	this->vec_from_str(str);//避免重复拷贝_str
-
-
 }
+
 	void BigInteger::append_zeros(size_t num){
 	append_digits(string(num, '0'));
 	}
-
-
 
 //用来强制转换  关系是 << 用来检测 str()是不是
 BigInteger::operator std::string() const{
@@ -274,7 +402,6 @@ bool BigInteger:: operator > (const BigInteger& other)const{
 	return other < *this;
 }
 
-
 bool BigInteger::operator==(const BigInteger& other)const{
 	return negative == other.negative && *s == *(other.s);
 	}
@@ -284,7 +411,6 @@ inline void swap(BigInteger& lhs, BigInteger& rhs){
 	swap(lhs.s, rhs.s);
 	swap(lhs.negative, rhs.negative);
 }
-
 
 ostream& operator << (ostream& out, const BigInteger& big){
 	assert(big.length() > 0);
@@ -344,12 +470,14 @@ void BigInteger::vec_from_str(const string& str){
 
   string  BigInteger::str_from_vec()  const
 {
-	 string str;
+	string str;
 	str.reserve(length()*WIDTH);
+
 	if (negative)
 		str += "-";
 
 	 str += to_string(s->back());//最高位不需要补充0
+
 	for (int i = length() - 2; i >= 0; --i){
 		auto tmp = to_string((*s)[i]);
 		if (tmp.length() < WIDTH)
@@ -362,3 +490,29 @@ void BigInteger::vec_from_str(const string& str){
 void BigInteger::	set_resversable(){
 	negative = !negative;
 }
+
+void inline BigInteger::remove_redundant_zeros()//去掉前置的0
+ {
+
+	//这里有多个细节;至少要保留一个0
+	if (length() == 1) return;//不需要处理
+
+	int non_zero = 0;
+	int len = length();
+
+	auto iter = s->rbegin();
+	while (non_zero < len && *iter++ == 0){
+		non_zero += 1;
+	}
+
+	if (non_zero)
+	{
+		if (non_zero == len )
+			non_zero -= 1;
+		auto beg = s->begin() + len - non_zero ;
+		s->erase(beg,s->end());
+	}
+ }
+
+
+

@@ -4,13 +4,15 @@
 #include "sstream"
 #include "time.h"
 #include "cassert"
-
-#define COMPARE 1
+#include "FFTFunctor.h"
+#include "FFTMultiplier.h"
+#define COMPARE 0
 #define COMPUTE(x) do{clock_t start_time = clock(); \
 	x; \
 	clock_t end_time = clock(); \
 	cout << "Running time is: " << static_cast<double>\
 	(end_time - start_time) / CLOCKS_PER_SEC * 1000 << "ms" << endl; }while (0)  //输出运行时间
+#define EXPECT_INT(result,correct) do{assert(result == correct);}while(0)
 
 void Add_Test();
 void Sub_Test();
@@ -64,31 +66,29 @@ void MultiPly_Test(){
 #if 1
 	string a4 = "44444444444", b4 = "2222222222";
 	correct = "98765432087901234568";
-	COMPUTE(cout << (Effective_multiply(a4, b4) == correct) << endl);
+	//COMPUTE(cout << (Effective_multiply(a4, b4) == correct) << endl);
 
 	string a5 = "123456789123456789", b5 = "98765432123456789";//
 	correct = "12193263126352689864349947750190521";
-	COMPUTE(cout << (Effective_multiply(a5, b5) == correct) << endl);
+	//COMPUTE(cout << (Effective_multiply(a5, b5) == correct) << endl);
 
 
 	string a7 = "172222222234566666666663456564365835634144443", b7 = "123455555555555255555555555552454232348897821";
 	correct = "21261790124980728703703303694873314334566791251130343554428157608965752534229925361958703";
-	COMPUTE(cout << (Effective_multiply(a7, b7) == correct) << endl);
+	//COMPUTE(cout << (Effective_multiply(a7, b7) == correct) << endl);
 
 	string a8 = "158610744283305641116339861354533472329775122";
 	correct = "25157368202104173113981398220939162641587521514899015555207154711683506072518799090114884";
-	COMPUTE(cout << (Effective_multiply(a8, a8) == correct) << endl);
+	//COMPUTE(cout << (Effective_multiply(a8, a8) == correct) << endl);
 
 #endif
 
 	//测试性能
-# if 0
-	COMPUTE(Effective_multiply(a, b));//10000*8000  12275
-
-	COMPUTE(Effective_multiply(a2, b2));// 9000 * 9000  6623
-
-	COMPUTE(cout << Effective_multiply(a3, b3));// 90000 * const  4533
-#endif
+	if (COMPARE){
+		COMPUTE(Effective_multiply(a, b));//10000*8000  12275
+		COMPUTE(Effective_multiply(a2, b2));// 9000 * 9000  6623
+		COMPUTE(Effective_multiply(a3, b3));// 90000 * const  4533
+	}
 }
 
 void Mod_Test(){
@@ -133,14 +133,17 @@ void Load_Test(){
 
 void Big_Add_Test(){
 
-#define EXPECT_INT(a,b,c) do {BigInteger x = a;BigInteger y = b;BigInteger z = c;\
+#define EXPECT_INT_ADD(a,b,c) do {BigInteger x = a;BigInteger y = b;BigInteger z = c;\
 	assert(z == (x + y)); }while (0)
 
-	EXPECT_INT("123456", "123456", "246912");
-	EXPECT_INT("123456123456", "123456", "123456246912");
-	EXPECT_INT("123456123456123456", "123456", "123456123456246912");
-	EXPECT_INT("54723895472398547230", "43528945723895723984", "98252841196294271214");
-	EXPECT_INT("999999999999999999", "11111111111111", "1000011111111111110");
+	EXPECT_INT_ADD("123456", "123456", "246912");
+	EXPECT_INT_ADD("123456123456", "123456", "123456246912");
+	EXPECT_INT_ADD("123456123456123456", "123456", "123456123456246912");
+	EXPECT_INT_ADD("54723895472398547230", "43528945723895723984", "98252841196294271214");
+	EXPECT_INT_ADD("999999999999999999", "11111111111111", "1000011111111111110");
+	EXPECT_INT_ADD("15681","7442833","7458514");
+	
+	
 	if (COMPARE){
 		BigInteger a8 = "45239872398472309" + string(100758900, '5');
 		BigInteger b8 = "432972384022023949958" + string(60054340, '7') + "437298423097458942307592308";
@@ -232,20 +235,85 @@ void Operator_Mod_Test(){
 	check_mod(BigInteger("20000001122334455"), BigInteger("1000000000"), BigInteger("122334455"));
 }
 
+void Operator_Mul_Test(){  
+#define EXPECT_INT_MUL(a,b,c) do {EXPECT_INT((BigInteger(a)*BigInteger(b)),BigInteger(c));} while(0)
+   
+	EXPECT_INT_MUL("1", "12345578329532984572398", "12345578329532984572398");
+	EXPECT_INT_MUL("34252354231", "0", "0");
+	EXPECT_INT_MUL("12345", "12345", "152399025");
+	EXPECT_INT_MUL("7458514","7458514","55629431088196");
+	EXPECT_INT_MUL("12345987654321", "12345543212345", "152417924085497789759792745");
+	EXPECT_INT_MUL("44444444444", "2222222222", "98765432087901234568");
+	EXPECT_INT_MUL("123456789123456789", "98765432123456789", \
+		"12193263126352689864349947750190521");
+	EXPECT_INT_MUL("172222222234566666666663456564365835634144443", \
+		"123455555555555255555555555552454232348897821", \
+		"21261790124980728703703303694873314334566791251130343554428157608965752534229925361958703");
+	
+
+	string a8 = "158610744283305641116339861354533472329775122";
+     EXPECT_INT_MUL(a8, a8, \
+		"25157368202104173113981398220939162641587521514899015555207154711683506072518799090114884");
+
+	 if (COMPARE){
+		 string a = string(10000, '3') + "172222222234566666666663456564365835634144443";// 1000 3
+		 string b = string(8000, '4') + "123455555555555255555555555552454232348897821";// 200 4
+		 string a2 = string(9000, '3') + "12387766544329887776544345678899";
+		 string b2 = string(9000, '2') + "54978723598347523985439875923085";
+		 string a3 = string(90000, '9') + "52345235252";
+		 string b3 = "532896572389755479872549875423985723987653298";
+		 string b4 = string(1000, '2') + "54978723598347523985439875923085";
+
+		 auto x1 = BigInteger(a), x2 = BigInteger(b);
+		 auto x3 = BigInteger(a2), x4 = BigInteger(b2);
+		 auto x5 = BigInteger(a3), x6 = BigInteger(b3);
+		 auto x7 = BigInteger(b4);
+		 COMPUTE(x1*x2);
+		 COMPUTE(x3*x4);
+		 COMPUTE(x5*x6);
+		 COMPUTE(x7*x7);
+	 }
+}
+
+void Operator_Shif_Test(){
+#define EXPECT_INT_SHIFT(B,num,C) do{\
+	auto _y = BigInteger(B)<<num;EXPECT_INT(_y,BigInteger(C));}while(0)
+
+	EXPECT_INT_SHIFT("1", 2, "4");
+	EXPECT_INT_SHIFT("1111222212", 1, "2222444424");
+	EXPECT_INT_SHIFT("0", 2, "0");
+	//cout <<( BigInteger("15342424532453254") << 1) <<endl;
+	EXPECT_INT_SHIFT("15342424532453254", 1, "30684849064906508");
+	EXPECT_INT_SHIFT("15342424532453254", 10, "15710642721232132096");
+	EXPECT_INT_SHIFT("15342424532453254", 12, "62842570884928528384");
+	EXPECT_INT_SHIFT("15342424532453254", 50, "17274034351829107757228014698496");
+
+	EXPECT_INT_SHIFT("-1", 1, "-2");
+}
+
 int  main()
 {
 	/**String Based Test Case*/
 	//Test();
-	BigInteger x;
+#if 0
 	Load_Test();
 	Add_Test();
 	Big_Add_Test();
 	Push_Front_Test();
-	Digits_Test();
-	sub_integer_rough_Test();
+	//Digits_Test();
+	//sub_integer_rough_Test();
 	Sub_Test();
 	Operator_Subtract_Test();
 	Mod_Test();
 	Operator_Mod_Test();
+#endif
+	Operator_Shif_Test();
+	//MultiPly_Test();
+	//Operator_Mul_Test();
+
+
+
+
+
 	return 0;
 }
