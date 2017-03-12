@@ -6,8 +6,9 @@ using namespace std;
 class FFTMultiPlier
 {
 public:
-	static const int FFTBase = 10000;
-	static const int FFTWidth = 4;
+	static const int FFTWidth = 8;
+	static const int FFTBase  = 1 << FFTWidth;//
+	static const int FFTMax   = FFTBase - 1;// 0xff
 	typedef double Real;
 	typedef vector<Real> Vectype;
 	typedef Vectype&  RefVec;

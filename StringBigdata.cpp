@@ -16,9 +16,9 @@ using namespace std;
 
 inline string remove_pre_zero(const string& a)
 {
-	auto t = a.find_first_not_of('0', 0);//去掉前置的0
+	auto t = a.find_first_not_of('\0', 0);
 	if (t == a.npos)
-		return "0";
+		return string("0");
 	else
 		return a.substr(t);
 }
@@ -104,21 +104,30 @@ string Mod(const string& a, const string& b)//实现大数求余的第二种情况,a,b都很大
 		return record[!k];
 }
 
+
+
 string convert_to_bin(const string& _s)
 {
+	const static string str[] = { "0", "1" };
+	string s(_s.size(), '0');
 	string binary;
-	string s(_s);
-	while (s != "0")//模拟不断的除2取余
+	binary.reserve(_s.size() * 3);
+	int i = 0;
+	for (const auto& c : _s)
+		s[i++] = (c - '0');
+
+	while (s != "0")//simulate divide by 2
 	{
 		int t = 0, old_t = 0;
-		for (int i = 0; i != s.length(); ++i)//内循环计算一次除法和一次取余运算
+		for (auto& ch : s)
 		{
-			t = (old_t * 10 + s[i] - '0') % 2;//计算余数
-			s[i] = (s[i] - '0' + old_t * 10) / 2 + '0';//计算除以2的这一位的商
-			old_t = t;//更新余数
+			t = ((old_t * 10 + ch) & 1);
+			ch = (ch + old_t * 10) >> 1;
+			old_t = t;
 		}
-		binary += int_to_string(t);
-		s = remove_pre_zero(s);//获得一次计算后的商
+		binary += str[t];
+		if (s[0] == 0)
+			s = remove_pre_zero(s);
 	}
 	return string(binary.rbegin(), binary.rend());
 }

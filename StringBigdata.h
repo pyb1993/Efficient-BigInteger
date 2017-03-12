@@ -12,6 +12,7 @@ string multiply(const string& x,const string& y);
 inline int Mod(string&, int&);//首先实现大数求余1 : A%B(A很大B可以用整数表示)
 string Mod(const string&, const string&);//实现大数求余2 : A%B(A，B不可以用整数表示)
 string Subtract(const  string& a, const string& b, bool reverse = false);//实现大数求减法 A-B
+inline string remove_pre_zero(const string& a);
 string convert_to_bin(const string&);//实现大数转换到二进制
 string Effective_multiply(const string&, const string&);
 int      Power_mod(int& x, int& y, int& z);

@@ -32,7 +32,7 @@ void FFTFunctor::fft(const RefVec Coef, RefVec FFT, short sign){
 	int t = FFTLength -1;
 	int count = 0;
 	while (t){ 
-		t = t &(t - 1);
+		t = t & (t - 1);
 		++count;
 	}
 	for (int i = 1; i < FFTLength - 1; ++i){
@@ -47,7 +47,7 @@ void FFTFunctor::fft(const RefVec Coef, RefVec FFT, short sign){
 	//interval代表当前FFT的子序列的长度
 	for (size_t interval = 1; interval < FFTLength; interval*= 2) // 执行 log2(nn) 次外循环
 		       {
-				cout << "outer loop\n";
+				//cout << "outer loop\n";
 		         double theta = (2*sign) * PI / (2*interval);
 		         double alpha = sin(0.5 * theta);
 		         alpha = -2 * alpha * alpha;
@@ -56,11 +56,11 @@ void FFTFunctor::fft(const RefVec Coef, RefVec FFT, short sign){
 		         double OmegaI = 0;
 		         for (int m = 0;  m < interval; ++m)//m代表每一个子变换的起始位置
 			         {
-					   cout << " middle loop  "<<"("<<OmegaR<<","<<OmegaI<<")\n";
+					   //cout << " middle loop  "<<"("<<OmegaR<<","<<OmegaI<<")\n";
 			           for (int i = m; i < FFTLength; i += 2*interval)// FFT[i]代表每一个子序列在当前位置的FFT系数
 				           {
 				             size_t j = i + interval; // 下面是 Danielson-Lanczos 公式
-							 cout << "   innner loop : i = " << i << "  j = " << j << endl;
+							 //cout << "   innner loop : i = " << i << "  j = " << j << endl;
 				             Real tmpR = OmegaR * FFT[2*j] - OmegaI * FFT[2*j + 1];
 							 Real tmpI = OmegaR * FFT[2*j + 1] + OmegaI * FFT[2*j];
 				             FFT[2*j] = FFT[2*i] - tmpR;
@@ -80,12 +80,12 @@ void FFTFunctor::fft(const RefVec Coef, RefVec FFT, short sign){
 
 void FFTFunctor::InverseFFT(const RefVec FFT, RefVec Coef)
 {
-	long i;
+	size_t i;
 	Real invNFFT = 1. / (Real)FFTLength, tmp;
 	Vectype IFFT(2*FFTLength, 0);
 	fft(FFT,IFFT,-1);
 	auto len = Coef.size();
-	for (i = 0; i<2 * len; i+=2) 
+	for (i = 0; i <2 * len; i+=2) 
 	{
 		/* 四舍五入,还原序列*/
 		tmp = invNFFT*IFFT[i];

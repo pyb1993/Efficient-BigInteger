@@ -6,6 +6,7 @@
 #include "vector"
 #include "algorithm"
 #include "memory"
+#include "climits"
 
 #ifndef _MSC_VER
 #define NOEXCEPT noexcept
@@ -14,45 +15,59 @@
 #endif
 
 using namespace std;
+enum Radix { Bin, Hex, Dec };
 class BigInteger{	
 public:
-	using eletype = int;
+	using eletype = unsigned long;
+	using maxtype = unsigned long long;
 	using datatype = vector<eletype>;
-	static const int DefaultBase = 100000000;
-	static const int DefaultWIDTH = 8;
-	const int BASE;
-	const int WIDTH;
+	static const eletype Max = ULONG_MAX;//2^32 - 1
+	static const unsigned long long BASE = (unsigned long long)ULONG_MAX + 1;//2^32
+	static const int WIDTH = 32;
 
 	friend class FFTMultiPlier;
 
 	friend inline void swap(BigInteger& lhs, BigInteger& rhs);
 	friend ostream& operator << (ostream& out, const BigInteger& big);
-	friend BigInteger operator - (const BigInteger& big);
-	friend BigInteger subtract     (const BigInteger& lhs, const BigInteger& r,  bool neg = false);
+	friend BigInteger operator -(const BigInteger& big);
+	friend BigInteger subtract  (const BigInteger& lhs, const BigInteger& r,  bool neg = false);
 
-	BigInteger(const int Base = DefaultBase, const int WIDTH = DefaultWIDTH);
-	BigInteger(const BigInteger&, const int Base = DefaultBase, const int WIDTH = DefaultWIDTH);
-	BigInteger(const long long& num, const int Base = DefaultBase, const int WIDTH = DefaultWIDTH);
-	BigInteger(const string&, const int Base = DefaultBase, const int WIDTH = DefaultWIDTH);
-	BigInteger(const vector<double>&, size_t len, long long other_base = 10000,short other_width = 4);//用来接收一个数组,专门处理FFT的结果
-	BigInteger(BigInteger&&, const int Base = DefaultBase, const int WIDTH = DefaultWIDTH) NOEXCEPT;
+	BigInteger();
+	BigInteger(const BigInteger&);
+	BigInteger( unsigned long long& num);//可能溢出,必须用unsigned long long
+	BigInteger(const long long& num);
+
+	BigInteger(const string&);
+	BigInteger(const vector<double>&, size_t len, short other_width = 8);//用来接收一个数组,专门处理FFT的结果
+	BigInteger(BigInteger&&) NOEXCEPT;
 	~BigInteger();
 
 
 	BigInteger& operator= (const BigInteger& rhs);
-	BigInteger& operator= ( long long num);
+	BigInteger& operator= (long long num);
+	BigInteger& operator= (unsigned long long& num);
+
 	BigInteger& operator= (const string& str);
 	BigInteger& operator= (BigInteger&&) NOEXCEPT;
 
 
 
 	BigInteger operator + (const BigInteger&) const;
+	BigInteger operator + (const long long &) const;
+
 	BigInteger operator - (const BigInteger&) const;
 	BigInteger operator * (const BigInteger&) const;
+	BigInteger operator * (const long &) const;
+
 	BigInteger operator / (const BigInteger&) const;
 	BigInteger operator %(const BigInteger&) const;
 	BigInteger operator <<(size_t num) const;
 	BigInteger operator >>(size_t num) const;
+
+	void operator *= (const BigInteger&);//此处是否应该返回
+	void operator += (const BigInteger&);
+
+
 
 
 	bool operator < (const BigInteger& other)const;
@@ -67,21 +82,19 @@ public:
 	void resize(size_t size);
 	void reserve(size_t size);
 	void push_back(const eletype& x);
-	void append_zeros(size_t);
-	void append_digits(const string&);
-	string         str() const;
+	string str() const;
 
 	BigInteger sub_integer_rough(size_t start , unsigned int len = npos ) const;
 	BigInteger sub_integer(size_t start, unsigned int   len = npos) const;
 	BigInteger Inverse() const;
 	void set_resversable();
+	unsigned short highest_bitsnum() const;
 	operator string () const;
     
 private:
-
-	void vec_from_str(const string&);
+	void parse_binary(const string& str,Radix radix);
 	string str_from_vec() const;
-	void remove_redundant_zeros();
+	inline void remove_redundant_zeros();
 	datatype* s = nullptr;
 	bool negative = false;
 	static const size_t npos = -1;
@@ -89,8 +102,11 @@ private:
 };
 inline void swap(BigInteger& lhs, BigInteger& rhs);
 ostream& operator << (ostream& out, const BigInteger& big);
-BigInteger operator - (const BigInteger&);
 BigInteger subtract(const BigInteger& lhs, const BigInteger& r, \
 const vector<BigInteger::eletype>&, bool neg = false);
-inline  int fast_atoi(const char* str, int len);
+inline unsigned long long fast_atoi(const char* str, int len);
+inline string convert_to_binary(string::const_iterator _s, size_t len);
+inline int get_min_binary_power(int x);
+inline void bin_shift_multiply( BigInteger&, const string&);
+inline void get_type(const string& str, Radix& radix, bool& negative, int& beg);
 #endif

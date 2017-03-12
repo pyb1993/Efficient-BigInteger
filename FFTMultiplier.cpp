@@ -55,19 +55,23 @@ void FFTMultiPlier::Convert_Base( RefVec Ret, const BigInteger& lhs)
 {	
 	auto len = lhs.length();
 	assert(len > 0);
-	Ret.reserve(lhs.length() << 1);
-	if (lhs.WIDTH != 4){
+	Ret.reserve(lhs.length() << 2);
+	if (lhs.WIDTH != FFTWidth){
 		auto s = lhs.s;
 		for (size_t i = 0; i < len - 1; ++i){
-			Ret.push_back( (*s)[i] % FFTBase);
-			Ret.push_back((*s)[i] / FFTBase);
+			auto val = (*s)[i];
+			for (size_t j = 0; j < lhs.WIDTH / FFTWidth; ++j)
+			{
+				Ret.push_back(val & FFTMax);
+				val >>= FFTWidth;
+			}
 		}
-		auto re = (*s)[len - 1];
-		auto remain = re % FFTBase;
-		Ret.push_back(remain);
-		if (re > FFTBase)
-			Ret.push_back(re / FFTBase);
 
+		auto remain = (*s)[len - 1];
+		while (remain){
+			Ret.push_back(remain & FFTMax);
+			remain >>= FFTWidth;
+		}
 	}
 }
 //处理进位
@@ -77,15 +81,14 @@ void FFTMultiPlier::UpdateResult()
 	//合并
 	long  carry = 0;
 	for (size_t j = 0; j < Result.size(); ++j){
-		auto tmp = Result[j] + carry;
-		carry = tmp/FFTBase;
-		Result[j] = tmp - carry*FFTBase;
+		long tmp = Result[j] + carry;
+		carry = tmp >> FFTWidth;
+		Result[j] = tmp & FFTMax;
 	}
 	int i = Result.size() - 1;
 	while (i >= 0 && Result[i] == 0) { --i; }
 	ResultSize = i>=0 ? i + 1:1 ;//去掉0后的size
 }
-
 FFTMultiPlier::~FFTMultiPlier(){
 
 }
