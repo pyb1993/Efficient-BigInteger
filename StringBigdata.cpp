@@ -13,7 +13,6 @@ using namespace std;
 #define int_to_string(s) (to_string(s))
 #define CHOOSE 1
 
-
 inline string remove_pre_zero(const string& a)
 {
 	auto t = a.find_first_not_of('\0', 0);
@@ -103,7 +102,6 @@ string Mod(const string& a, const string& b)//实现大数求余的第二种情况,a,b都很大
 		}
 		return record[!k];
 }
-
 
 
 string convert_to_bin(const string& _s)

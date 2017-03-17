@@ -32,13 +32,9 @@ FFTMultiPlier::FFTMultiPlier(const BigInteger& lhs, const BigInteger& rhs){
 void FFTMultiPlier::Convolution(const RefVec A, const RefVec B, RefVec C)
 {
 	long i;
-	Real tmpR, tmpI;
-
 	for (i = 0; i<FFTLength; i++) {
-		tmpR = A[2*i]*B[2*i] - A[2*i+1]*B[2*i+1];
-		tmpI = A[2*i]*B[2*i+1] + A[2*i+1]*B[2*i];
-		C[2*i] = tmpR;
-		C[2*i+1] = tmpI;
+		C[2 * i] = A[2 * i] * B[2 * i] - A[2 * i + 1] * B[2 * i + 1];//tmpR
+		C[2 * i + 1] = A[2 * i] * B[2 * i + 1] + A[2 * i + 1] * B[2 * i];//tmpI
 	}
 }
 BigInteger FFTMultiPlier::MulWithFFT(){

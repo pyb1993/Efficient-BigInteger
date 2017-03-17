@@ -12,116 +12,14 @@
 	clock_t end_time = clock(); \
 	cout << "Running time is: " << static_cast<double>\
 	(end_time - start_time) / CLOCKS_PER_SEC * 1000 << "ms" << endl; }while (0)  //输出运行时间
+
 #define EXPECT_INT(result,correct) do{assert(result == correct);}while(0)
-
-void Add_Test();
-void Sub_Test();
-void MultiPly_Test();
-void Mod_Test();
-void Power_Mod_Test();
-void Test(){
-	//Add_Test();
-	Sub_Test();
-	//MultiPly_Test();
-	//Mod_Test();
-	Power_Mod_Test();
-}
-
-void Add_Test(){
-	string a6 = "366666666", b6 = "666666666";
-	string a7 = "244444444", b7 = "444444444";
-
-	//COMPUTE(cout << add(a6, b6) << endl);//1033333332
-	//COMPUTE(cout << add(a7, b7) << endl);//
-
-#if 0
-	if (COMPARE){
-		string a8 = a6 + string(100758900, '5');
-		string b8 = b6 + string(60054340, '7') + "437298423097458942307592308";
-		COMPUTE(add(a8, b8));
-	}
-#endif
-
-}
-
-void Sub_Test(){
-	string a1 = "5422296287557037040", b1 = "71185184863703704", c1 = "2962962958814814816";
-//	COMPUTE(cout << Subtract(Subtract(a1, c1), b1) << endl);
-
-//	COMPUTE(cout << Subtract(b1, b1) << endl);
-
-	
-	}
-
-void MultiPly_Test(){
-	string a = string(10000, '3') + "172222222234566666666663456564365835634144443";// 1000 3
-	string b = string(8000, '4') + "123455555555555255555555555552454232348897821";// 200 4
-	string a2 = string(9000, '3') + "12387766544329887776544345678899";
-	string b2 = string(9000, '2') + "54978723598347523985439875923085";
-	string a3 = string(90000, '9') + "52345235252";
-	string b3 = "532896572389755479872549875423985723987653298";
-	string correct;
-	//测试正确性
-#if 1
-	string a4 = "44444444444", b4 = "2222222222";
-	correct = "98765432087901234568";
-	//COMPUTE(cout << (Effective_multiply(a4, b4) == correct) << endl);
-
-	string a5 = "123456789123456789", b5 = "98765432123456789";//
-	correct = "12193263126352689864349947750190521";
-	//COMPUTE(cout << (Effective_multiply(a5, b5) == correct) << endl);
-
-
-	string a7 = "172222222234566666666663456564365835634144443", b7 = "123455555555555255555555555552454232348897821";
-	correct = "21261790124980728703703303694873314334566791251130343554428157608965752534229925361958703";
-	//COMPUTE(cout << (Effective_multiply(a7, b7) == correct) << endl);
-
-	string a8 = "158610744283305641116339861354533472329775122";
-	correct = "25157368202104173113981398220939162641587521514899015555207154711683506072518799090114884";
-	//COMPUTE(cout << (Effective_multiply(a8, a8) == correct) << endl);
-
-#endif
-
-	//测试性能
-	if (COMPARE){
-		COMPUTE(Effective_multiply(a, b));//10000*8000  12275
-		COMPUTE(Effective_multiply(a2, b2));// 9000 * 9000  6623
-		COMPUTE(Effective_multiply(a3, b3));// 90000 * const  4533
-	}
-}
-
-void Mod_Test(){
-	string a = "172222222234566666666663456564365835634144443";// 1000 3
-	string b = "123455555555555255555555555552454232348897821";// 200 4
-	COMPUTE(Mod(a, b));
-
-	string a1 = string(1000, '3') + "158610744283305641116339861354533472329775122";
-	string b1 = string(200, '4') + b;
-	if (COMPARE)
-	    COMPUTE(Mod(a1, b1));
-
-
-}
-void Power_Mod_Test(){
-
-	string correct;
-	string a = "172222222234566666666663456564365835634144443";// 1000 3
-	string b = "123455555555555255555555555552454232348897821";// 200 4
-	string c = "222222222222227777777777777777777777777722571";
-	correct = "88130890624492142766705661885585287750833038";
-	//COMPUTE(cout << (Power_mod(a, b, c) == correct) << endl);// 
-
-
-	string a1 = string(1000, '3') + a, b1 = string(200, '4') + b;
-	//COMPUTE(cout << Power_mod(a1, b1, c) << endl);// 
-
-	string a2 = string(10000, '3') + a, b2 = string(8000, '4') + b;
-	//COMPUTE(cout << Power_mod(a2, b2, c) << endl);// 
-}
-
-void Load_Test(){
 #define EXPECT_STR(x) do {BigInteger y = x;assert(y.str() == string(x));}while(0)
 #define EXPECT_BIN_STR(x,c) do {BigInteger y = x;assert(y.str()==c);}while(0)
+
+
+void Load_Test(){
+
 #if 1
 
 	/*****测试10进制***********************************/
@@ -134,7 +32,7 @@ void Load_Test(){
 	EXPECT_STR("100000000000000000000000000000000000000000000000000000000");
 	EXPECT_STR(string(6, '1'));
 	EXPECT_STR(string(11, '1'));
-	EXPECT_STR(string(1023, '3'));
+	//EXPECT_STR(string(1023, '3'));
 	EXPECT_STR("-123456789987654320");
 	EXPECT_STR((string(6888, '1') + "523452345"));
 	EXPECT_STR((string(11888, '5') + "523537289452345"));
@@ -173,7 +71,8 @@ void Load_Test(){
 	} while (0);
 }
 
-void Big_Add_Test(){
+void Big_Add_Test()
+{
 
 #define EXPECT_BIG_ADD(a,b,c) do {BigInteger x = a;BigInteger y = b;BigInteger z = c;\
 	EXPECT_INT(x + y, z); }while (0)
@@ -192,43 +91,31 @@ void Big_Add_Test(){
 	EXPECT_BIG_ADD("54723895472398547230", "43528945723895723984", "98252841196294271214");
 	EXPECT_BIG_ADD("999999999999999999", "11111111111111", "1000011111111111110");
 	EXPECT_BIG_ADD("15681","7442833","7458514");
+	EXPECT_BIG_ADD("15681", "-7442833", "-7427152");
+
+	BigInteger t = "170870028598891192848284015688560738254488757978562964938989677583429754298574441955";
+
 	EXPECT_BIG_ADD("95437298723452938475389443298903485909254234524575382543245689999999999999999999122", \
 				   "75432729875438254372894572389657252345234523453987582395743987583429754298574442833",\
 		"170870028598891192848284015688560738254488757978562964938989677583429754298574441955");
 
-	
 		if (COMPARE){
 			do{
 				cout << "test BigInteger operator + :\n";
 				BigInteger a = "0x45239872398472309" + string(100758900, '5');
 				BigInteger b = "0x432972384022023949958" + string(60054340, '7') + "437298423097458942307592308";
-				BigInteger a1 = "0x45239872398472309" + string(100000, '5');
-				BigInteger b1 = "0x432972384022023949958" + string(100000, '7') + "437298423097458942307592308";
-
+				BigInteger a1 = "45239872398472309" + string(100000, '5');
+				BigInteger b1 = "432972384022023949958" + string(100000, '7') + "437298423097458942307592308";
 				COMPUTE(a + b);
 				COMPUTE(for (int i = 0; i < 100000; ++i) auto c = a1 + b1;);
 			} while (0);
+		}	
+ }
 
 
-			do{
-				cout << "test string add  :" << endl;
-				string a = string(100758900, '5');
-				string b = string(60054340, '7') + "437298423097458942307592308";
-				BigInteger a1 = "45239872398472309" + string(100000, '5');
-				BigInteger b1 = "432972384022023949958" + string(100000, '7') + "437298423097458942307592308";
-
-				COMPUTE(add(a, b));
-				//COMPUTE(for (int i = 0; i < 100000; ++i) add(a1,b1);); too slow
-
-			}while(0);
-		}
-	
-}
-
-
-
-void sub_integer_rough_Test(){
-#define test_sub(x,s,e,res) do{BigInteger t = x; \
+void sub_integer_rough_Test()
+{
+    #define test_sub(x,s,e,res) do{BigInteger t = x; \
 	auto sub = t.sub_integer_rough(s, e); \
 	assert(sub.str() == res); }while (0)
 
@@ -236,79 +123,74 @@ void sub_integer_rough_Test(){
     test_sub("123456789100000000999999999", 0, 1, "6692605");
 	//test_sub("1234567891000000000000000000000000000000", 4, 1, "0");
 	//test_sub("123456789100000000", 0, 1, "12");
-
 }
 
 void Operator_Subtract_Test(){
 
 #define EXPECT_INT_SUB(a,b,c) do {BigInteger x = a;BigInteger y = b;BigInteger z = c;\
 	assert(z == (x - y)); }while (0)
+#if 0
+	EXPECT_INT_SUB("0x10000000000000", "0", "0x10000000000000");
 
-	
 	EXPECT_INT_SUB("123456", "123456", "0");
-	EXPECT_INT_SUB("123456123456", "123456", "123456000000");
+	EXPECT_INT_SUB("0x123456123456", "0x123456", "20015990439936");
 	EXPECT_INT_SUB("123456123456123456", "123456", "123456123456000000");
 	EXPECT_INT_SUB("54723895472398547230", "43528945723895723984", "11194949748502823246");
 	EXPECT_INT_SUB("999999999999999999", "11111111111111", "999988888888888888");
 	EXPECT_INT_SUB("1", "123456789987654321", "-123456789987654320");
 	EXPECT_INT_SUB("5422296287557037040", "71185184863703704", "5351111102693333336");
 	EXPECT_INT_SUB("71185184863703704", "70185184863745604", "999999999958100");
-
+#endif
 	if (COMPARE)//比较性能
 	{
 		do{
 			cout << "test operator -\n";
 			BigInteger a = "0x4523" + string(100758900, '5');
 			BigInteger b = "0x5234532" + string(60054340, '7') + "437298423097458942307592308";
-			BigInteger a1 = "0x4523532452" + string(100030, '5');
+			BigInteger a1 = "0x4523532452" + string(100000, '5');
 			BigInteger b1 = "0x5234532" + string(100000, '7') + "437298423097458942307592308";
+			BigInteger a2 = "0x45239872398472309" + string(100000, '5');
+			BigInteger b2 = "0x432972384022023949958" + string(100000, '7') + "437298423097458942307592308";
+
 			COMPUTE(auto c = a - b;);
-			COMPUTE(for (int i = 0; i < 100000;++i) auto c = a1 - b1;);
-
+			COMPUTE(for (int i = 0; i < 100000;++i) auto c = b1 - a1;);
 		} while (0);
-
-
-		do{
-			cout << "test string subtract\n";
-			string a = string(100758900, '5');
-			string b = string(60054340, '7') + "437298423097458942307592308";
-			COMPUTE(Subtract(a, b));
-		} while (0);
-
 	}
 		
 
 }
 
-void Digits_Test(){
-#define test_digits(x,s,e,res) do{BigInteger t = x; \
-	auto sub = t.sub_integer(s, e); \
-	assert(sub.str() == res); }while (0)
-
-	test_digits("123456", 2, 3, "345");
-	test_digits("1234567891234567", 0, 9, "123456789");
-	test_digits("123456999999999999999",7 , -1, "99999999999999");
-	
-}
 void Operator_Mod_Test(){
 
-#define check_mod(x,y,z) do{assert((x%y)==z);}while(0)
-	BigInteger a = "172222222234566666666663456564365835634144443";// 1000 3
-	BigInteger b = "123455555555555255555555555552454232348897821";// 200 4
-	BigInteger correct = "48766666679011411111107901011911603285246622";
-	check_mod(a,b,correct);
-
+#define check_mod(x,y,z) do{assert((BigInteger(x)%BigInteger(y))==BigInteger(z));}while(0)
 	
+	auto t = BigInteger("123456") % BigInteger("2") ;
+	check_mod("123456", "2", "0");
+
+
+	check_mod("172222222234566666666663456564365835634144443",\
+		"123455555555555255555555555552454232348897821",\
+		"48766666679011411111107901011911603285246622");
+
 #if 1
 	BigInteger a1 = string(1000, '3') + "158610744283305641116339861354533472329775122";
 	BigInteger b1 = (string(200, '4') + "123455555555555255555555555552454232348897821");
-	correct = "90691965790704901677330261963876131847549\
+	BigInteger correct = "90691965790704901677330261963876131847549\
 58818036214446122552271032357689245532028384930706999117863789625062896214097\
 065882559894377367640182030209506368739503353301237508903141281380208333333333\
 333158610744283305641116339861354533472329775122";
+	BigInteger a2 = a1 + string(20000, '12');
+	BigInteger b2 = a1 + string(10000, '23');
+
 	check_mod(a1, b1, correct);
-	if (COMPARE)
-	COMPUTE(a1 % b1);
+	BigInteger c;
+	if (COMPARE){
+		COMPUTE(c = a2 % b2);
+		cout << c.length() << endl;
+	}
+
+
+
 #endif
 
 	check_mod(BigInteger("20000001122334455"), BigInteger("1000000000"), BigInteger("122334455"));
@@ -347,114 +229,70 @@ void Operator_Mul_Test(){
 	if (COMPARE){
 		do{
 			cout << "test Big operator mul:\n";
-			BigInteger a = "0x532"+string(50000, '3') + "172222222234566666666663456564365835634144443";// 1000 3
-			BigInteger b = "0x6263"+string(50000, '4') + "123455555555555255555555555552454232348897821";// 200 4
-			BigInteger a2 = "0x532"+string(9000, '3') + "12387766544329887776544345678899";
-			BigInteger b2 = "0x535423A2"+string(9000, '2') + "54978723598347523985439875923085";
-			BigInteger a3 = "0x532D"+string(90000, '9') + "52345235252";
-			BigInteger b3 = "0x532896572389755479872549875423985723987653298";
-
+			BigInteger a = "532"+string(50000, '3') + "172222222234566666666663456564365835634144443";// 1000 3
+			BigInteger b = "6263"+string(50000, '4') + "123455555555555255555555555552454232348897821";// 200 4
+			BigInteger a2 = "532"+string(9000, '3') + "12387766544329887776544345678899";
+			BigInteger b2 = "5354232"+string(9000, '2') + "54978723598347523985439875923085";
+			BigInteger a3 = "532"+string(90000, '9') + "52345235252";
+			BigInteger b3 = "532896572389755479872549875423985723987653298";
+			BigInteger a4 = "532" + string(500000, '9') + "52345235252";
+			BigInteger b4 = a4;
 			COMPUTE(a = a*b);// 50000 * 45000
 			COMPUTE(a2 = a2*b2);// 9000 * 9000
 			COMPUTE(a3 = a3*b3);// 90000 * const
+			COMPUTE(a4 = a4*b4);// 500000 * 500000
 
-		
+			cout << "test tiny mul 50000!\n";
+			/*Test for Tiny mul*/
+			COMPUTE(BigInteger ans = "1"; for (int i = 1; i < 50000; ++i){ ans *= i; });
 
 		} while (0);
-
 	 }
 }
 
 void Operator_Shif_Test(){
-#define EXPECT_INT_SHIFT(B,num,C) do{\
-	auto _y = BigInteger(B)<<num;EXPECT_INT(_y,BigInteger(C));}while(0)
+#define EXPECT_INT_SHIFT(B,num,C,shift) do{\
+	auto _y = BigInteger(B) shift num; EXPECT_INT(_y, BigInteger(C)); }while (0)
 
-	EXPECT_INT_SHIFT("1", 2, "4");
-	EXPECT_INT_SHIFT("1111222212", 1, "2222444424");
-	EXPECT_INT_SHIFT("0", 2, "0");
-	EXPECT_INT_SHIFT("15342424532453254", 1, "30684849064906508");
-	EXPECT_INT_SHIFT("15342424532453254", 10, "15710642721232132096");
-	EXPECT_INT_SHIFT("15342424532453254", 12, "62842570884928528384");
-	EXPECT_INT_SHIFT("15342424532453254", 50, "17274034351829107757228014698496");
-	EXPECT_INT_SHIFT("-1", 1, "-2");
-}
+#define EXPECT_INT_LSHIFT(B,num,C) EXPECT_INT_SHIFT(B,num,C,<<)
+#define EXPECT_INT_RSHIFT(B,num,C) EXPECT_INT_SHIFT(B,num,C,>>)
+#define EXPECT_INT_RSHIFT_EQUAL(B,num,C) do{ \
+	BigInteger _B(B); \
+	_B >>= num; \
+	assert(_B == BigInteger(C));\
+}while (0)
 
-void FFT_Test(){
-#define EXPECT_FFT_MUL(x,y,correct) do{\
-	FFTMultiPlier f(BigInteger(x), BigInteger(y)); \
-	assert(f.MulWithFFT() == BigInteger(correct));}while (0)
+/********Test Shift Left*************************************/
+	EXPECT_INT_LSHIFT("1", 2, "4");
+	EXPECT_INT_LSHIFT("1111222212", 1, "2222444424");
+	EXPECT_INT_LSHIFT("0", 2, "0");
+	EXPECT_INT_LSHIFT("15342424532453254", 1, "30684849064906508");
+	EXPECT_INT_LSHIFT("15342424532453254", 10, "15710642721232132096");
+	EXPECT_INT_LSHIFT("15342424532453254", 12, "62842570884928528384");
+	EXPECT_INT_LSHIFT("15342424532453254", 50, "17274034351829107757228014698496");
+	EXPECT_INT_LSHIFT("-1", 1, "-2");
 
-	EXPECT_FFT_MUL("1", "4294967296","4294967296");
-	EXPECT_FFT_MUL("123456", "123456", "15241383936");
-	EXPECT_FFT_MUL("123456789", "123456789", "15241578750190521");
-	EXPECT_FFT_MUL("1", "12345578329532984572398", "12345578329532984572398");
+/********Test Shift Right*************************************/
+	EXPECT_INT_RSHIFT("1", 1, "0");
+	EXPECT_INT_RSHIFT("1111222212", 1, "555611106");
+	EXPECT_INT_RSHIFT("0", 2, "0");
+	EXPECT_INT_RSHIFT("15342424532453254", 1, "7671212266226627");
+	EXPECT_INT_RSHIFT("15342424532453254", 10, "14982836457473");
+	EXPECT_INT_RSHIFT("153424245324532541234565473829624523", 12, "37457091143684702449845086384185");
+	EXPECT_INT_RSHIFT("15342424532453254123456547382962452353424532523", 50, "13626810375602763979202822659930");
+	EXPECT_INT_RSHIFT("-1", 1, "0");
+	EXPECT_INT_RSHIFT("-100000000066666777777",42,"-22737367");
 
-	auto f = FFTMultiPlier(BigInteger("0"), BigInteger("34252354231"));
-	auto ans =  (f.MulWithFFT());
-
-	EXPECT_FFT_MUL("34252354231", "0", "0");
-	EXPECT_FFT_MUL("12345", "12345", "152399025");
-	EXPECT_FFT_MUL("7458514", "7458514", "55629431088196");
-	EXPECT_FFT_MUL("12345987654321", "12345543212345", "152417924085497789759792745");
-	EXPECT_FFT_MUL("44444444444", "2222222222", "98765432087901234568");
-	EXPECT_FFT_MUL("123456789123456789", "98765432123456789", \
-		"12193263126352689864349947750190521");
-	EXPECT_FFT_MUL("172222222234566666666663456564365835634144443", \
-		"123455555555555255555555555552454232348897821", \
-		"21261790124980728703703303694873314334566791251130343554428157608965752534229925361958703");
-
-	string a3 = "158610744283305641116339861354533472329775122";
-	EXPECT_FFT_MUL("158610744283305641116339861354533472329775122", a3, \
-		"25157368202104173113981398220939162641587521514899015555207154711683506072518799090114884");
-	BigInteger a4 = "1" + string(2000, '0');
-	EXPECT_FFT_MUL(a4, ("3" + string(2000, '0')), ("3" + string(4000, '0')));
-
-	if (COMPARE){
-		do{
-			cout << "test FFT operator for big mul:\n";
-			BigInteger a = "0x532" + string(500000, '3') + "172222222234566666666663456564365835634144443";// 1000 3
-			BigInteger b = "0x6263" + string(500000, '4') + "123455555555555255555555555552454232348897821";// 200 4
-		
-			BigInteger c(0);
-			COMPUTE(auto f = FFTMultiPlier(a, b);   c = f.MulWithFFT(););// 50000 * 45000
-			cout << c.length();
-		} while (0);
-
-		do{
-			cout << "test Big operator And FFT for small mul:\n";
-			BigInteger a0 = "0x532" + string(1, '3') + "12387766544329887776544345678899";
-			BigInteger b0 = "0x535423A2" + string(1, '2') + "54978723598347523985439875923085";
-
-			BigInteger a1 = "0x532" + string(1000, '3') + "12387766544329887776544345678899";
-			BigInteger b1 = "0x535423A2" + string(1000, '2') + "54978723598347523985439875923085";
-
-			BigInteger a2 = "0x532" + string(5000, '3') + "172222222234566666666663456564365835634144443";// 1000 3
-			BigInteger b2 = "0x6263" + string(5000, '4') + "123455555555555255555555555552454232348897821";// 200 4
-			
-			BigInteger a3 = "0x532D" + string(50000, '9') + "52345235252";
-			BigInteger b3 = "0x532896572389755479872549875423985723987653298";
-
-			BigInteger a4 = "0x532D" + string(150000, '9') + "52345235252";
-			BigInteger b4 = "0x532896572389755" + string(500000,'7');
-
-			cout << "Big Operator *\n";
-			COMPUTE(a0*b0);// 100 100
-			COMPUTE(a1*b1);// 1000 * 1000
-			COMPUTE(a2*b2);// 5000 * 5000
-			COMPUTE(a3*b3);// 50000 * 50000
-			COMPUTE(a4*b4);//100000 * const
-
-			cout << "FFT  *\n";
-			BigInteger c(0);
-			COMPUTE(auto f = FFTMultiPlier(a0, b0); c = f.MulWithFFT());// 100 100
-			COMPUTE(auto f = FFTMultiPlier(a1, b1); c = f.MulWithFFT());// 100 100
-			COMPUTE(auto f = FFTMultiPlier(a2, b2); c = f.MulWithFFT());// 100 100
-			COMPUTE(auto f = FFTMultiPlier(a3, b3); c = f.MulWithFFT());// 100 100
-			COMPUTE(auto f = FFTMultiPlier(a4, b4); c = f.MulWithFFT());// 100 100
-
-		
-		} while (0);
-	}
+/********Test Performance****************************/
+	EXPECT_INT_RSHIFT_EQUAL("1", 1, "0");
+	EXPECT_INT_RSHIFT_EQUAL("1111222212", 1, "555611106");
+	EXPECT_INT_RSHIFT_EQUAL("0", 2, "0");
+	EXPECT_INT_RSHIFT_EQUAL("15342424532453254", 1, "7671212266226627");
+	EXPECT_INT_RSHIFT_EQUAL("15342424532453254", 10, "14982836457473");
+	EXPECT_INT_RSHIFT_EQUAL("153424245324532541234565473829624523", 12, "37457091143684702449845086384185");
+	EXPECT_INT_RSHIFT_EQUAL("15342424532453254123456547382962452353424532523", 50, "13626810375602763979202822659930");
+	EXPECT_INT_RSHIFT_EQUAL("-1", 1, "0");
+	EXPECT_INT_RSHIFT_EQUAL("-100000000066666777777", 42, "-22737367");
 
 }
 
@@ -494,33 +332,132 @@ void Operator_addeq_Test(){
 			COMPUTE(for (int i = 0; i < 100000; ++i) { a1 += b1;});
 
 		} while (0);
+	  }
 	}
-	}
+
+void Test_Operator_Div()
+{
+
+#define EXPECT_BIG_DIV(a,b,c) do {BigInteger x = a;BigInteger y = b;BigInteger z = c;\
+	EXPECT_INT(x / y, z); }while (0)
+#define EXPECT_LONG_DIV(a,b,c) do{EXPECT_INT((BigInteger(a)/b),BigInteger(c));}while(0)
+
+	EXPECT_LONG_DIV("123456789",1,"123456789");
+	EXPECT_LONG_DIV("123456789", 3, "41152263");
+	EXPECT_LONG_DIV("1234", 1235, "0");
+	EXPECT_LONG_DIV("1234", 1234, "1");
+	EXPECT_LONG_DIV("34252354231", 1, "34252354231");
+	EXPECT_LONG_DIV("55629431088196", 7458514, "7458514");
+
+	EXPECT_LONG_DIV("152417924085497789759792745", 1234554, "123459908667824809412");
+	EXPECT_LONG_DIV("12193263126352689864349947750190521", 999, \
+		"12205468594947637501851799549740");
+
+
+	EXPECT_BIG_DIV("1", "12345578329532984572398", "0");
+	EXPECT_BIG_DIV("34252354231", "1", "34252354231");
+	EXPECT_BIG_DIV("12345", "12345", "1");
+	EXPECT_BIG_DIV("55629431088196", "7458514", "7458514");
+	EXPECT_BIG_DIV("152417924085497789759792745", "12345543212345", "12345987654321");
+	EXPECT_BIG_DIV("44444444444", "22222222222", "2");
+	EXPECT_BIG_DIV("12193263126352689864349947750190521", "98765432123456789", \
+		"123456789123456789");
+
+	EXPECT_BIG_DIV("21261790124980728703703303694873314334566791251130343554428157608965752534229925361958703", \
+		"123455555555555255555555555552454232348897821", \
+		"172222222234566666666663456564365835634144443");
+
+	string a = "158610744283305641116339861354533472329775122";
+	EXPECT_BIG_DIV("25157368202104173113981398220939162641587521514899015555207154711683506072518799090114884", a, \
+		a);
+
+
+	BigInteger a0 = "11" + string(2000, '2');
+	auto c = a0 / BigInteger("1" + string(1000, '0'));
+
+	//BigInteger a1 = "0x54235234523452354324" + string(10000)
+
+	/*************测试性能***********************/
+	cout << "test for big div\n";
+	BigInteger a1 = "0x10" + string(330000, '5');
+	BigInteger a2 = "0x20" + string(180000, '6') + "72839647298034307439207";
+
+	COMPUTE(a1 / a2);
+}
+
+void Test_Truncate_mul(){
+#define EXPECT_TRUNCATE_MUL(a,b,c) do{BigInteger(a)*BigInteger(b)               }while(0)
+
+	cout << "test for truncate mul\n";
+	do{
+		BigInteger a = "0x"+string(492086,'1')+"123456789123456789123456789";
+		BigInteger b = "0x12345" + string(282345, '2');;
+		COMPUTE(a.truncate_mul(b));
+		COMPUTE(a*b);
+	} while (0);
+
+}
+
+void Test_toString(){
+	do {
+#define EXPECT_BIN_STR(x,c) do {BigInteger y = x;assert(y.toString(Bin)==c);}while(0)
+
+		EXPECT_BIN_STR((1024 + 512), "11000000000");
+		EXPECT_BIN_STR("0b111111000000000000000", "111111000000000000000");
+		EXPECT_BIN_STR("0b111111", "111111");
+		EXPECT_BIN_STR("0b10000000000000000000000000000000000000000000000000", \
+			"10000000000000000000000000000000000000000000000000");
+		EXPECT_BIN_STR("0b111100011100011101010101010101010101001010101010100101010101010100101", \
+			"111100011100011101010101010101010101001010101010100101010101010100101");
+	} while (0);
+
+
+	do {
+#define EXPECT_DEC_STR(x) do {BigInteger y = x;assert(y.toString(Dec) == string(x));}while(0)
+		EXPECT_DEC_STR("123456789123456789");
+		EXPECT_DEC_STR("1234567891234554237896789");
+		EXPECT_DEC_STR("123456789123456785734298299");
+		EXPECT_DEC_STR("0");
+		EXPECT_DEC_STR("-1");
+		EXPECT_DEC_STR("-17584230972390473");
+
+		if (COMPARE){
+			BigInteger a1 = "11" + string(50000, '2');
+			BigInteger a2 = "11" + string(30000, '2');
+			BigInteger a3 = "11" + string(100000, '2');
+			BigInteger a4 = "11" + string(213237, '2');
+
+			cout << "test for toString to DEC\n";
+			COMPUTE(a1.toString(Dec));
+			COMPUTE(a2.toString(Dec));
+			COMPUTE(a3.toString(Dec));
+			COMPUTE(a4.toString(Dec));		
+		
+		}
+	} while (0);
+ }
+
+void Test_Pow(){
+#define EXPECT_POWER(a,e,c) do{BigInteger(a).pow(e) == BigInteger(c);}while(0)
+	EXPECT_POWER("1234", 5, "2861381721051424");
+	EXPECT_POWER("12345", 5, "286718338524635465625");
+	EXPECT_POWER("0", 5, "0");
+	EXPECT_POWER("-2", 5, "-32");
+	EXPECT_POWER("-2", 6, "64");
+}
+
+
 
 
 int  main()
 {
-	/**String Based Test Case*/
-	//Test();
-
 	Load_Test();
-
-#if 0
-
-	Digits_Test();
-	Push_Front_Test();
-	Mod_Test();
-	Sub_Test();
-
-	Operator_Mod_Test();
-	sub_integer_rough_Test();
-	Operator_Shif_Test();
 	Big_Add_Test();
 	Operator_Subtract_Test();
-#endif
-	//MultiPly_Test();
-	//Operator_Mul_Test();
-	//FFT_Test();
-	//Operator_addeq_Test();
+	Operator_Mul_Test();
+	Test_Operator_Div();
+	Operator_Mod_Test();
+	//Operator_Shif_Test();
+	Test_toString();
 	return 0;
 }
