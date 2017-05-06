@@ -31,6 +31,8 @@ A efficient libarary for BigInteger.
 接下来主要是修改toString这个模块，现在采取double dabble算法进行转换，对于大数据来说太慢了。我准备使用原来的１０进展大数类来进行转换。
 暂时没有去理toString,而是测试了除法，发现20万位/10万位需10s,需要的时间太久了，４０万/２０万位的则很久都计算不出来结果，几种常见的大数类都只要３－５ｓ就能计算出来。
 
+##增加knuth algorithm D; 
+
 最终结果:parsing:50 万位10进制 转 BigInteger  7.6s
         +       :10万位加法 执行 10万次 4s
                  1亿位加法,46ms
